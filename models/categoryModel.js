@@ -6,7 +6,14 @@ export function findAllCategories() {
     SELECT * FROM categories;
     `;
 
-  console.log(pool);
+  pool
+    .query("SELECT NOW()")
+    .then((result) => {
+      console.log("DB CONNECTION OK:", result.rows);
+    })
+    .catch((err) => {
+      console.error("DB CONNECTION ERROR:", err);
+    });
 
   return pool.query(queryString).then((res) => {
     console.log(res);
