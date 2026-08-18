@@ -19,7 +19,7 @@ if (!process.env.PGDATABASE && !process.env.DB_URL) {
 }
 
 const config =
-  ENV === "prod"
+  ENV === "prod" || ENV === "dev"
     ? {
         connectionString: process.env.DB_URL,
         max: 2,
