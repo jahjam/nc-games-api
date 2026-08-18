@@ -8,8 +8,6 @@ export const __dirname = path.dirname(__filename);
 
 const ENV = process.env.NODE_ENV || "dev";
 
-console.log(ENV);
-
 dotenv.config({
   path: `${__dirname}/../.env.${ENV}`,
 });

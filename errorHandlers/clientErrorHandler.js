@@ -1,5 +1,4 @@
 export function clientErrorHandler(err, req, res, next) {
-  console.log(err);
   if (
     err.status === 400 &&
     err.error === "Invalid input type for votes, input must be a number"

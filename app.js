@@ -35,8 +35,6 @@ app.use("/api", limiter);
 
 app.use(xss());
 
-console.log("here");
-
 app.get("/api/categories", getAllCategories);
 app.get("/api/reviews/:review_id", getOneReview);
 app.get("/api/reviews", getAllReviews);
