@@ -1,9 +1,9 @@
-const db = require("../db/connection");
+import pool from "../db/connection.js";
 
-exports.findAllCategories = () => {
+export function findAllCategories() {
   const queryString = `
     SELECT * FROM categories;
     `;
 
-  return db.query(queryString).then((res) => res.rows);
-};
+  return pool.query(queryString).then((res) => res.rows);
+}

@@ -1,29 +1,29 @@
-const xss = require("xss-clean");
-const rateLimit = require("express-rate-limit");
+import { xss } from "express-xss-sanitizer";
+import rateLimit from "express-rate-limit";
 
-const { getAllCategories } = require("./controllers/categoryController");
-const {
+import { getAllCategories } from "./controllers/categoryController.js";
+import {
   getOneReview,
   getAllReviews,
   getAllComments,
   postOneComment,
   patchOneReview,
-} = require("./controllers/reviewController");
-const { deleteOneComment } = require("./controllers/commentController");
-const { getAllUsers } = require("./controllers/userController");
-const { clientErrorHandler } = require("./errorHandlers/clientErrorHandler");
-const { psqlErrorHandler } = require("./errorHandlers/psqlErrorHandler");
+} from "./controllers/reviewController.js";
+import { deleteOneComment } from "./controllers/commentController.js";
+import { getAllUsers } from "./controllers/userController.js";
+import { clientErrorHandler } from "./errorHandlers/clientErrorHandler.js";
+import { psqlErrorHandler } from "./errorHandlers/psqlErrorHandler.js";
 
-const endpointsJson = require("./endpoints.json");
+import endpointsJson from "./endpoints.json" with { type: "json" };
 
-const express = require("express");
-const cors = require("cors");
+import express, { json } from "express";
+import cors from "cors";
 
 const app = express();
 
 app.use(cors());
 
-app.use(express.json());
+app.use(json());
 
 const limiter = rateLimit({
   max: 100,
@@ -49,14 +49,14 @@ app.get("/api", (req, res, next) => {
       new Error({
         error: `Something went wrong`,
         status: 400,
-      })
+      }),
     );
   }
 
   res.status(200).send({ endpoints: endpointsJson });
 });
 
-app.all("*", (req, res, next) => {
+app.all("/{*splat}", (req, res, next) => {
   res.status(404).send({
     error: `${req.originalUrl} is not available on this server`,
     status: 404,
@@ -66,4 +66,4 @@ app.all("*", (req, res, next) => {
 app.use(clientErrorHandler);
 app.use(psqlErrorHandler);
 
-module.exports = app;
+export default app;

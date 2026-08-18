@@ -1,12 +1,12 @@
-const db = require("../db/connection");
+import pool from "../db/connection.js";
 
-exports.removeOneComment = (id) => {
+export function removeOneComment(id) {
   const queryString = `
   DELETE FROM comments
   WHERE comment_id = $1
 `;
 
-  return db.query(queryString, [id]).then((res) => {
+  return pool.query(queryString, [id]).then((res) => {
     if (!res.rowCount) {
       return Promise.reject({
         status: 404,
@@ -16,4 +16,4 @@ exports.removeOneComment = (id) => {
 
     return res.rows;
   });
-};
+}

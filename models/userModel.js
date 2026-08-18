@@ -1,9 +1,9 @@
-const db = require("../db/connection");
+import pool from "../db/connection.js";
 
-exports.findAllUsers = () => {
+export function findAllUsers() {
   const queryString = `
    SELECT * FROM users; 
   `;
 
-  return db.query(queryString).then((res) => res.rows);
-};
+  return pool.query(queryString).then((res) => res.rows);
+}

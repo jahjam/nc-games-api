@@ -4,18 +4,18 @@
   "description": "bc-nc-games",
   "main": "listen.js",
   "scripts": {
-    "setup-dbs": "psql -f ./db/setup.sql",
+    "setup-dbs": "psql -d nc_games -f ./db/setup.sql",
     "seed": "node ./db/seeds/run-seed.js",
     "test": "jest",
-    "prepare": "husky install",
     "start": "node listen.js",
     "start:dev": "npm run seed & nodemon listen.js",
-    "seed-prod": "NODE_ENV=production npm run seed"
+    "seed-prod": "NODE_ENV=prod npm run seed"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/northcoders/be-nc-games.git"
   },
+  "type": "module",
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -24,21 +24,21 @@
   },
   "homepage": "https://github.com/northcoders/be-nc-games#readme",
   "dependencies": {
-    "cors": "^2.8.5",
-    "dotenv": "^16.0.0",
-    "express": "^4.18.2",
-    "express-rate-limit": "^6.7.0",
-    "pg": "^8.7.3",
-    "pg-format": "^1.0.4",
-    "xss-clean": "^0.1.1"
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.6.2",
+    "express-xss-sanitizer": "^2.0.2",
+    "pg": "^8.23.0",
+    "pg-format": "^1.0.4"
   },
   "devDependencies": {
-    "husky": "^8.0.2",
-    "jest": "^27.5.1",
-    "jest-extended": "^2.0.0",
-    "jest-sorted": "^1.0.14",
-    "nodemon": "^2.0.22",
-    "supertest": "^6.3.3"
+    "eslint": "^10.8.1",
+    "jest": "^30.4.2",
+    "jest-extended": "^7.0.0",
+    "jest-sorted": "^1.0.15",
+    "nodemon": "^3.1.14",
+    "supertest": "^7.2.2"
   },
   "jest": {
     "setupFilesAfterEnv": [

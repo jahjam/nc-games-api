@@ -1,7 +1,16 @@
-const { Pool } = require("pg");
-const ENV = process.env.NODE_ENV || "development";
+import { Pool } from "pg";
+import dotenv from "dotenv";
+import { fileURLToPath } from "url";
+import path from "path";
 
-require("dotenv").config({
+export const __filename = fileURLToPath(import.meta.url);
+export const __dirname = path.dirname(__filename);
+
+const ENV = process.env.NODE_ENV || "dev";
+
+console.log(ENV);
+
+dotenv.config({
   path: `${__dirname}/../.env.${ENV}`,
 });
 
@@ -10,11 +19,13 @@ if (!process.env.PGDATABASE && !process.env.DB_URL) {
 }
 
 const config =
-  ENV === "production"
+  ENV === "prod"
     ? {
         connectionString: process.env.DB_URL,
         max: 2,
       }
     : {};
 
-module.exports = new Pool(config);
+const pool = new Pool(config);
+
+export default pool;

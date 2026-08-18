@@ -1,30 +1,26 @@
-const db = require('../connection');
-const format = require('pg-format');
-const {
-  convertTimestampToDate,
-  createRef,
-  formatComments
-} = require('./utils');
+import pool from "../connection.js";
+import format from "pg-format";
+import { convertTimestampToDate, createRef, formatComments } from "./utils.js";
 
 const seed = ({ categoryData, commentData, reviewData, userData }) => {
-  return db
-    .query(`DROP TABLE IF EXISTS comments;`)
+  const query = pool.query.bind(pool);
+  return query(`DROP TABLE IF EXISTS comments;`)
     .then(() => {
-      return db.query(`DROP TABLE IF EXISTS reviews;`);
+      return query(`DROP TABLE IF EXISTS reviews;`);
     })
     .then(() => {
-      return db.query(`DROP TABLE IF EXISTS users;`);
+      return query(`DROP TABLE IF EXISTS users;`);
     })
     .then(() => {
-      return db.query(`DROP TABLE IF EXISTS categories;`);
+      return query(`DROP TABLE IF EXISTS categories;`);
     })
     .then(() => {
-      const topicsTablePromise = db.query(`
+      const topicsTablePromise = query(`
 			CREATE TABLE categories (
 				slug VARCHAR PRIMARY KEY,
 				description VARCHAR
 			);`);
-      const usersTablePromise = db.query(`
+      const usersTablePromise = query(`
 			CREATE TABLE users (
 				username VARCHAR PRIMARY KEY,
 				name VARCHAR NOT NULL,
@@ -34,7 +30,7 @@ const seed = ({ categoryData, commentData, reviewData, userData }) => {
       return Promise.all([topicsTablePromise, usersTablePromise]);
     })
     .then(() => {
-      return db.query(`
+      return query(`
 			CREATE TABLE reviews (
 				review_id SERIAL PRIMARY KEY,
 				title VARCHAR NOT NULL,
@@ -48,7 +44,7 @@ const seed = ({ categoryData, commentData, reviewData, userData }) => {
 			);`);
     })
     .then(() => {
-      return db.query(`
+      return query(`
 			CREATE TABLE comments (
 				comment_id SERIAL PRIMARY KEY,
 				body VARCHAR NOT NULL,
@@ -60,27 +56,27 @@ const seed = ({ categoryData, commentData, reviewData, userData }) => {
     })
     .then(() => {
       const insertCategoriesQueryStr = format(
-        'INSERT INTO categories (slug, description) VALUES %L;',
-        categoryData.map(({ slug, description }) => [slug, description])
+        "INSERT INTO categories (slug, description) VALUES %L;",
+        categoryData.map(({ slug, description }) => [slug, description]),
       );
-      const categoriesPromise = db.query(insertCategoriesQueryStr);
+      const categoriesPromise = query(insertCategoriesQueryStr);
 
       const insertUsersQueryStr = format(
-        'INSERT INTO users (username, name, avatar_url) VALUES %L;',
+        "INSERT INTO users (username, name, avatar_url) VALUES %L;",
         userData.map(({ username, name, avatar_url }) => [
           username,
           name,
-          avatar_url
-        ])
+          avatar_url,
+        ]),
       );
-      const usersPromise = db.query(insertUsersQueryStr);
+      const usersPromise = query(insertUsersQueryStr);
 
       return Promise.all([categoriesPromise, usersPromise]);
     })
     .then(() => {
       const formattedReviewData = reviewData.map(convertTimestampToDate);
       const insertReviewsQueryStr = format(
-        'INSERT INTO reviews (title, category, designer, owner, review_body, review_img_url, created_at, votes) VALUES %L RETURNING *;',
+        "INSERT INTO reviews (title, category, designer, owner, review_body, review_img_url, created_at, votes) VALUES %L RETURNING *;",
         formattedReviewData.map(
           ({
             title,
@@ -90,7 +86,7 @@ const seed = ({ categoryData, commentData, reviewData, userData }) => {
             review_body,
             review_img_url,
             created_at,
-            votes
+            votes,
           }) => [
             title,
             category,
@@ -99,30 +95,30 @@ const seed = ({ categoryData, commentData, reviewData, userData }) => {
             review_body,
             review_img_url,
             created_at,
-            votes
-          ]
-        )
+            votes,
+          ],
+        ),
       );
 
-      return db.query(insertReviewsQueryStr);
+      return query(insertReviewsQueryStr);
     })
     .then(({ rows: reviewRows }) => {
-      const reviewIdLookup = createRef(reviewRows, 'title', 'review_id');
+      const reviewIdLookup = createRef(reviewRows, "title", "review_id");
       const formattedCommentData = formatComments(commentData, reviewIdLookup);
       const insertCommentsQueryStr = format(
-        'INSERT INTO comments (body, author, review_id, votes, created_at) VALUES %L;',
+        "INSERT INTO comments (body, author, review_id, votes, created_at) VALUES %L;",
         formattedCommentData.map(
           ({ body, author, review_id, votes = 0, created_at }) => [
             body,
             author,
             review_id,
             votes,
-            created_at
-          ]
-        )
+            created_at,
+          ],
+        ),
       );
-      return db.query(insertCommentsQueryStr);
+      return query(insertCommentsQueryStr);
     });
 };
 
-module.exports = seed;
+export default seed;

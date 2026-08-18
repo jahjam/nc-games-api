@@ -1,9 +1,9 @@
-const { removeOneComment } = require("../models/commentModel");
+import { removeOneComment } from "../models/commentModel.js";
 
-exports.deleteOneComment = (req, res, next) => {
+export function deleteOneComment(req, res, next) {
   const { comment_id: id } = req.params;
 
   removeOneComment(id)
     .then((response) => res.status(204).send())
     .catch(next);
-};
+}

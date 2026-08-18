@@ -1,7 +1,7 @@
-const db = require("../db/connection");
-const format = require("pg-format");
+import pool from "../db/connection.js";
+import format from "pg-format";
 
-exports.findOneReview = (id) => {
+export function findOneReview(id) {
   const query = `
   SELECT reviews.*, CAST(COUNT(comments.comment_id) AS INT) AS comment_count
   FROM reviews
@@ -10,17 +10,17 @@ exports.findOneReview = (id) => {
   GROUP BY reviews.review_id
   `;
 
-  return db.query(query, [id]).then((res) => {
+  return pool.query(query, [id]).then((res) => {
     if (res.rows.length === 0) {
       return Promise.reject({ error: "review not found", status: 404 });
     }
 
     return res.rows;
   });
-};
+}
 
-exports.findAllReviews = (category, sort_by, order = "desc") => {
-  return db.query("SELECT slug FROM categories").then((res) => {
+export function findAllReviews(category, sort_by, order = "desc") {
+  return pool.query("SELECT slug FROM categories").then((res) => {
     const categories = res.rows.map((row) => row.slug.replace("'", ""));
 
     if (order !== "asc" && order !== "desc") {
@@ -61,22 +61,22 @@ exports.findAllReviews = (category, sort_by, order = "desc") => {
         "GROUP BY reviews.review_id",
         format("WHERE reviews.category = %L GROUP BY reviews.review_id", [
           category,
-        ])
+        ]),
       );
     }
 
     if (sort_by) {
       queryString = queryString.replace(
         "ORDER BY created_at",
-        format("ORDER BY reviews.%s", [sort_by])
+        format("ORDER BY reviews.%s", [sort_by]),
       );
     }
 
-    return db.query(queryString).then((res) => res.rows);
+    return pool.query(queryString).then((res) => res.rows);
   });
-};
+}
 
-exports.findAllComments = (id) => {
+export function findAllComments(id) {
   const queryString = `
   SELECT 
   comment_id,
@@ -89,10 +89,10 @@ exports.findAllComments = (id) => {
   WHERE review_id = $1;
   `;
 
-  return db.query(queryString, [id]).then((res) => res.rows);
-};
+  return pool.query(queryString, [id]).then((res) => res.rows);
+}
 
-exports.addOneComment = (id, comment) => {
+export function addOneComment(id, comment) {
   if (comment && (!comment.username || !comment.body)) {
     return Promise.reject({
       error: "A comment must have both a body and a username",
@@ -108,15 +108,15 @@ exports.addOneComment = (id, comment) => {
     (%L)
   RETURNING *;
   `,
-    [0, new Date(Date.now()), comment.username, comment.body, id]
+    [0, new Date(Date.now()), comment.username, comment.body, id],
   );
 
-  return db.query(queryString).then((res) => {
+  return pool.query(queryString).then((res) => {
     return res.rows;
   });
-};
+}
 
-exports.updateOneReview = (id, body) => {
+export function updateOneReview(id, body) {
   const inputIsNotNumber = !/^-?[0-9]*$/.test(body.inc_votes);
 
   if (body && !body.inc_votes) {
@@ -141,5 +141,5 @@ exports.updateOneReview = (id, body) => {
     RETURNING *
   `;
 
-  return db.query(queryString, [id, body.inc_votes]).then((res) => res.rows);
-};
+  return pool.query(queryString, [id, body.inc_votes]).then((res) => res.rows);
+}

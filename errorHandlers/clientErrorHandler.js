@@ -1,4 +1,4 @@
-exports.clientErrorHandler = (err, req, res, next) => {
+export function clientErrorHandler(err, req, res, next) {
   console.log(err);
   if (
     err.status === 400 &&
@@ -42,4 +42,4 @@ exports.clientErrorHandler = (err, req, res, next) => {
   }
 
   next(err);
-};
+}
