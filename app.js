@@ -21,7 +21,7 @@ import cors from "cors";
 
 const app = express();
 
-app.use(cors());
+app.use(cors({ origin: "https://nc-games-react.onrender.com" }));
 
 app.use(json());
 
