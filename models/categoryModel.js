@@ -6,6 +6,8 @@ export function findAllCategories() {
     SELECT * FROM categories;
     `;
 
+  console.log(pool);
+
   return pool.query(queryString).then((res) => {
     console.log(res);
     return res.rows;
